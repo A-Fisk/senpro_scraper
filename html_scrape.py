@@ -349,6 +349,8 @@ if __name__ == "__main__":
         meals = select_meals(planner_section, curr_date)
         if meals:
             meal_plan[curr_date] = meals
+
+    filename = f'{list(meal_plan.keys())[0]}.json'
     
     # Save to JSON file
-    save_to_json(meal_plan)
+    save_to_json(meal_plan, filename=filename)

@@ -21,6 +21,7 @@ def list_available_meal_plans():
         return []
     
     meal_plans = [f for f in os.listdir(meal_plans_dir) if f.endswith('.json')]
+    pdb.set_trace()
     
     if not meal_plans:
         print("No meal plans found in the meal_plans directory")
@@ -213,6 +214,8 @@ if __name__ == "__main__":
     
     # Parse into an ical calendar invite
     cal = create_calendar(meal_plan)
+
+    pdb.set_trace()
     
     # Save into the cal invites dir
     save_calendar(cal, meal_plan_path)

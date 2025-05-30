@@ -1,0 +1,12 @@
+name: senpro_scrape
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - pip
+  - ipython
+  - beautifulsoup4
+  - pip:
+    - datetime
+    - icalendar

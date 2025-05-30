@@ -7,12 +7,43 @@ from calendar_invite import list_available_meal_plans, load_meal_plan, create_ca
 from bs4 import BeautifulSoup
 from datetime import datetime
 
+# Function to clear all meal plans and calendar files
+def clear_all_data():
+    # Clear meal_plans directory
+    plans_dir = "meal_plans"
+    if os.path.exists(plans_dir):
+        shutil.rmtree(plans_dir)
+        os.makedirs(plans_dir)
+    else:
+        os.makedirs(plans_dir)
+        
+    # Clear cal_invites directory
+    cal_dir = "cal_invites"
+    if os.path.exists(cal_dir):
+        shutil.rmtree(cal_dir)
+        os.makedirs(cal_dir)
+    else:
+        os.makedirs(cal_dir)
+
+# Clear all data at app startup
+clear_all_data()
+
 # Initialize session state
 if 'current_meal_plan' not in st.session_state:
     st.session_state.current_meal_plan = None
 
 st.set_page_config(page_title="SenPro Calendar Converter", layout="wide")
 st.title("SenPro Meal Plan to iCalendar Converter")
+
+# Add a reset button in the sidebar
+with st.sidebar:
+    st.header("Options")
+    if st.button("Reset All Data"):
+        clear_all_data()
+        st.session_state.current_meal_plan = None
+        st.success("All meal plans cleared!")
+        st.rerun()
+
 st.markdown("""
 This app converts your SenPro meal plans into iCalendar (.ics) files that you can import into any calendar application.
 

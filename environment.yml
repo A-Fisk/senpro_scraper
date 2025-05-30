@@ -3,11 +3,11 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.9
-  - pip
-  - ipython
-  - beautifulsoup4
-  - streamlit
+  - python=3.9.13
+  - pip=23.1.2
+  - ipython=8.14.0
+  - beautifulsoup4=4.12.2
+  - streamlit=1.29.0
   - pip:
-    - datetime
-    - icalendar
+    - datetime==5.4
+    - icalendar==5.0.11

@@ -213,8 +213,6 @@ if __name__ == "__main__":
     
     # Parse into an ical calendar invite
     cal = create_calendar(meal_plan)
-
-    pdb.set_trace()
     
     # Save into the cal invites dir
     save_calendar(cal, meal_plan_path)

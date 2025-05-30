@@ -1,13 +1,13 @@
 # SenPro Meal Planner Scraper
 
-A tool to scrape meal plans from a website and organize them into a structured JSON format. Optionally creates calendar invites for meal planning.
+A tool to scrape meal plans from HTML files and organize them into a structured JSON format. Optionally creates calendar invites for meal planning.
 
 ## Features
 
-- Scrapes meal planning data from a specified website
-- Extracts meal information organized by day and time
-- Saves data in a structured JSON format
-- Can generate calendar invites from the meal plan data
+- Extracts meal planning data from saved HTML files
+- Organizes meal information by date and time
+- Saves data in a structured JSON format using the date as filename
+- Creates calendar invites (.ics files) from the meal plan data
 
 ## Installation
 
@@ -27,38 +27,49 @@ A tool to scrape meal plans from a website and organize them into a structured J
 
 ### Scrape Meal Plans
 
-Run the HTML scraper to extract meal plans:
+Run the HTML scraper with the path to your saved HTML file:
 
 ```bash
-python html_scrape.py
+python html_scrape.py path/to/saved_page.html
 ```
 
 This will:
-1. Connect to the meal planning website
-2. Extract the meal planning information
-3. Save it to a timestamped JSON file (e.g., `meal_plan_20250530_123456.json`)
+1. Read the HTML file
+2. Extract meal planning information
+3. Save it to a JSON file named after the first date in the meal plan
 
-### Create Calendar Invites (Optional)
-
-Generate calendar invites from the scraped meal plan:
+You can also run the script in debug mode to explore the HTML structure:
 
 ```bash
-python calendar_invite.py meal_plan_20250530_123456.json
+python html_scrape.py path/to/saved_page.html --debug
 ```
 
-## Customization
+### Create Calendar Invites
 
-To adapt this for different websites, modify the following in `html_scrape.py`:
+Generate calendar invites from a previously saved meal plan:
 
-- Update the URL to point to your target website
-- Adjust the CSS selectors to match the structure of the target website
-- Modify the data extraction logic if needed
+```bash
+python calendar_invite.py
+```
+
+The script will:
+1. List all available meal plans in the `meal_plans` directory
+2. Let you select which plan to process
+3. Create calendar events for each meal
+4. Save as an .ics file in the `cal_invites` directory with the same base filename
+
+## Directory Structure
+
+- `html_scrape.py`: Script to extract meal plan data from HTML files
+- `calendar_invite.py`: Script to generate calendar invites from meal plans
+- `meal_plans/`: Directory where extracted meal plans are stored
+- `cal_invites/`: Directory where calendar invites are stored
 
 ## Requirements
 
 - Python 3.9+
 - Beautiful Soup 4
-- Requests
+- icalendar
 
 ## License
 

@@ -6,15 +6,39 @@ from calendar_invite import list_available_meal_plans, load_meal_plan, create_ca
 from bs4 import BeautifulSoup
 from datetime import datetime
 
-st.set_page_config(page_title="Meal Plan Manager", layout="wide")
-st.title("Meal Plan Manager")
+st.set_page_config(page_title="SenPro Calendar Converter", layout="wide")
+st.title("SenPro Meal Plan to iCalendar Converter")
+st.markdown("""
+This app converts your SenPro meal plans into iCalendar (.ics) files that you can import into any calendar application.
+
+### How to use this app:
+
+1. **Save your SenPro meal plan as HTML**:
+   - Go to your SenPro meal planning page
+   - Right-click anywhere on the page and select "Save As..." or "Save Page As..."
+   - Save the file with a .html extension
+   
+2. **Upload the HTML file** in the "Create Meal Plan" tab
+   
+3. **Generate and download the .ics file** in the "Generate Calendar Invites" tab
+
+4. **Import the .ics file** into your calendar application (Google Calendar, Outlook, Apple Calendar, etc.)
+
+### Support & Feature Requests
+
+Having issues or want to suggest improvements? Please open an issue on the
+[GitHub repository](https://github.com/A-Fisk/senpro_scrape/issues).
+""")
 
 # Create tabs for different functionality
-tab1, tab2 = st.tabs(["Create Meal Plan", "Generate Calendar Invites"])
+tab1, tab2 = st.tabs(["Step 1: Upload HTML & Create Meal Plan", "Step 2: Generate Calendar File"])
 
 # Tab 1: Create Meal Plan
 with tab1:
-    st.header("Create Meal Plan from HTML")
+    st.header("Step 1: Upload SenPro HTML and Create Meal Plan")
+    st.write("""
+    Upload the HTML file you saved from SenPro. The app will extract all meal information and create a structured meal plan.
+    """)
     
     # File uploader
     uploaded_file = st.file_uploader("Upload HTML file", type="html")
@@ -79,7 +103,11 @@ with tab1:
 
 # Tab 2: Generate Calendar Invites
 with tab2:
-    st.header("Generate Calendar Invites")
+    st.header("Step 2: Generate iCalendar File")
+    st.write("""
+    Select your saved meal plan and generate an iCalendar (.ics) file that you can import into 
+    Google Calendar, Apple Calendar, Outlook, or any other calendar application.
+    """)
     
     # List available meal plans
     meal_plans = list_available_meal_plans()
@@ -115,10 +143,37 @@ with tab2:
                         # Provide download link
                         with open(ics_file, "rb") as file:
                             btn = st.download_button(
-                                label="Download Calendar Invite (.ics)",
+                                label="Download Calendar File (.ics)",
                                 data=file,
                                 file_name=os.path.basename(ics_file),
                                 mime="text/calendar"
                             )
                         
-                        st.success("Calendar invites created successfully!")
+                        st.success("Calendar file created successfully!")
+                        
+                        # Add import instructions
+                        with st.expander("How to import this calendar file"):
+                            st.markdown("""
+                            ### Importing your calendar file:
+                            
+                            #### Google Calendar:
+                            1. Go to [Google Calendar](https://calendar.google.com/)
+                            2. Click the "+" next to "Other calendars"
+                            3. Select "Import"
+                            4. Upload the .ics file you downloaded
+                            5. Choose the calendar to add the events to
+                            6. Click "Import"
+                            
+                            #### Apple Calendar:
+                            1. Open the Calendar app
+                            2. Go to File > Import
+                            3. Select the .ics file you downloaded
+                            4. Click "Import"
+                            
+                            #### Outlook:
+                            1. Open Outlook
+                            2. Go to File > Open & Export > Import/Export
+                            3. Select "Import an iCalendar (.ics) or vCalendar file"
+                            4. Browse to the .ics file you downloaded
+                            5. Click "Open"
+                            """)

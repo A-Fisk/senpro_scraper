@@ -14,34 +14,20 @@ A tool to scrape meal plans from HTML files and organize them into a structured 
 
 ## Installation (For Beginners)
 
-### Step 1: Install Miniforge (Conda)
+### Step 1: Install Python
 
-Miniforge is a minimal installer for Conda, which is a package manager that will help install all the required dependencies.
+If you don't already have Python installed:
 
 #### For Windows:
-1. Download the Miniforge3 installer for Windows from [here](https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Windows-x86_64.exe)
-2. Run the downloaded .exe file
-3. Follow the installation prompts, keeping all default options
-4. Check the box that says "Add Miniforge3 to my PATH environment variable"
+1. Download the Python installer from [python.org](https://www.python.org/downloads/windows/)
+2. Run the installer
+3. Check "Add Python to PATH" during installation
+4. Click "Install Now"
 
 #### For macOS:
-1. Download the Miniforge3 installer for macOS from [here](https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-MacOSX-x86_64.sh) (for Intel Macs) or [here](https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-MacOSX-arm64.sh) (for Apple Silicon Macs)
-2. Open Terminal (you can find it in Applications > Utilities > Terminal)
-3. Navigate to your Downloads folder by typing:
-   ```
-   cd ~/Downloads
-   ```
-4. Make the installer executable by typing:
-   ```
-   chmod +x Miniforge3-MacOSX-*.sh
-   ```
-5. Run the installer:
-   ```
-   ./Miniforge3-MacOSX-*.sh
-   ```
-6. Follow the prompts, accepting the license and default installation location
-7. When asked if you want to initialize Miniforge3, type "yes"
-8. Close and reopen your Terminal window
+1. macOS comes with Python, but it's recommended to install the latest version
+2. Download the macOS installer from [python.org](https://www.python.org/downloads/macos/)
+3. Run the installer package and follow the instructions
 
 ### Step 2: Download This Project
 
@@ -71,17 +57,14 @@ Miniforge is a minimal installer for Conda, which is a package manager that will
    - Windows example: `cd C:\Users\YourName\Downloads\senpro_scrape`
    - macOS example: `cd ~/Downloads/senpro_scrape`
 
-### Step 3: Create and Activate the Conda Environment
+### Step 3: Install Required Packages
 
 1. In your Terminal or Command Prompt, make sure you're in the project directory (senpro_scrape)
-2. Create the conda environment with all required packages:
+2. Install all required packages:
    ```
-   conda env create -f environment.yml
+   pip install -r requirements.txt
    ```
-   This may take a few minutes as it downloads and installs all required packages.
-3. Activate the environment:
-   - Windows: `conda activate senpro_scrape`
-   - macOS: `conda activate senpro_scrape`
+   This will install all necessary dependencies for the project.
 
 ## Usage
 
@@ -107,12 +90,7 @@ If you prefer using the command line or need more control:
 
 #### Scrape Meal Plans
 
-1. Make sure your conda environment is activated:
-   ```
-   conda activate senpro_scrape
-   ```
-
-2. Run the HTML scraper, replacing the path with the location of your saved HTML file:
+1. Run the HTML scraper, replacing the path with the location of your saved HTML file:
 
    Windows example:
    ```
@@ -136,12 +114,7 @@ This will:
 
 #### Create Calendar Invites
 
-1. Make sure your conda environment is activated:
-   ```
-   conda activate senpro_scrape
-   ```
-
-2. Run the calendar invite generator:
+1. Run the calendar invite generator:
    ```
    python calendar_invite.py
    ```
@@ -160,12 +133,7 @@ This will:
 
 If you want to run the web app on your local machine:
 
-1. Make sure your conda environment is activated:
-   ```
-   conda activate senpro_scrape
-   ```
-
-2. Run the Streamlit app:
+1. Run the Streamlit app:
    ```
    streamlit run app.py
    ```
@@ -182,8 +150,8 @@ If you want to run the web app on your local machine:
 
 ## Troubleshooting
 
-- **"Command not found: conda"**: Try reopening your terminal or command prompt. If that doesn't work, you may need to add conda to your PATH manually.
-- **"No module named..."**: Make sure you've activated the conda environment with `conda activate senpro_scrape`.
+- **"Command not found: python"**: Make sure Python is installed and added to your PATH.
+- **"No module named..."**: Make sure you've installed all requirements with `pip install -r requirements.txt`.
 - **HTML parsing errors**: The script is designed for a specific website structure. If the meal plan website changes its layout, the script may need to be updated.
 
 ## Requirements

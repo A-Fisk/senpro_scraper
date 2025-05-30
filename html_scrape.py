@@ -51,7 +51,7 @@ def select_meals(soup, curr_date):
         curr_date: Date ID to extract meals for
         
     Returns:
-        List of meals for the specified date
+        List of meals for the specified date, sorted by time
     """
     # Find the div for the current date
     curr_day = soup.find_all("div", id=curr_date)
@@ -67,6 +67,7 @@ def select_meals(soup, curr_date):
     meal_css = curr_day[0].find_all("div", class_=['outline-box', 'pb-0', 'px-2', 'pt-2', 'mb-2', 'date_card_cont'])
     
     meal_total = []
+    meal_time_pairs = []
 
     # Process each meal
     for curr_meal, curr_time in zip(meal_css, curr_times):
@@ -79,8 +80,30 @@ def select_meals(soup, curr_date):
         
         # Combine into a single string with time, title, and details
         result = " ".join([curr_time, meal_title] + meal_details)
-        meal_total.append(result)
-
+        
+        # Extract time for sorting
+        time_str = curr_time.strip()
+        # Store the meal and its time for sorting
+        meal_time_pairs.append((time_str, result))
+    
+    # Sort meals by time
+    def time_to_minutes(time_str):
+        """Convert time string (HH:MM) to minutes for sorting"""
+        try:
+            parts = time_str.split(':')
+            if len(parts) == 2:
+                hours, minutes = map(int, parts)
+                return hours * 60 + minutes
+            return 0  # Default for invalid format
+        except (ValueError, IndexError):
+            return 0  # Default for parsing errors
+    
+    # Sort by the time component
+    meal_time_pairs.sort(key=lambda x: time_to_minutes(x[0]))
+    
+    # Extract just the meal strings in the sorted order
+    meal_total = [meal for _, meal in meal_time_pairs]
+    
     return meal_total
 
 

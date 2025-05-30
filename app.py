@@ -1,10 +1,15 @@
 import streamlit as st
 import os
 import json
+import shutil
 from html_scrape import read_html_file, parse_planner_section, get_dates, select_meals, save_to_json
 from calendar_invite import list_available_meal_plans, load_meal_plan, create_calendar, save_calendar
 from bs4 import BeautifulSoup
 from datetime import datetime
+
+# Initialize session state
+if 'current_meal_plan' not in st.session_state:
+    st.session_state.current_meal_plan = None
 
 st.set_page_config(page_title="SenPro Calendar Converter", layout="wide")
 st.title("SenPro Meal Plan to iCalendar Converter")
@@ -76,6 +81,9 @@ with tab1:
                     meal_plan[curr_date] = meals
                 progress_bar.progress((i + 1) / len(dates))
             
+            # Store meal plan in session state
+            st.session_state.current_meal_plan = meal_plan
+            
             # Display meal plan
             st.subheader("Meal Plan")
             
@@ -96,20 +104,18 @@ with tab1:
             with col2:
                 if st.button("Save Meal Plan"):
                     if filename:
-                        # Clean up existing meal plans
+                        # Clean up meal_plans directory completely
                         plans_dir = "meal_plans"
                         if os.path.exists(plans_dir):
-                            for file in os.listdir(plans_dir):
-                                if file.endswith('.json'):
-                                    os.remove(os.path.join(plans_dir, file))
+                            # Remove directory and recreate it
+                            shutil.rmtree(plans_dir)
+                            os.makedirs(plans_dir)
+                        else:
+                            os.makedirs(plans_dir)
                         
+                        # Save the meal plan
                         saved_file = save_to_json(meal_plan, f"{filename}.json")
                         st.success(f"Meal plan saved to {saved_file}")
-                        
-                        # Update session state to indicate we have a new meal plan
-                        if 'new_meal_plan' not in st.session_state:
-                            st.session_state.new_meal_plan = True
-                        st.session_state.new_meal_plan = True
                     else:
                         st.error("Please provide a filename")
 
@@ -121,76 +127,135 @@ with tab2:
     Google Calendar, Apple Calendar, Outlook, or any other calendar application.
     """)
     
-    # List available meal plans - refresh on each run
-    meal_plans = list_available_meal_plans()
-    
-    if not meal_plans:
-        st.warning("No meal plans found. Please create a meal plan first in Step 1.")
-    else:
-        # If only one meal plan exists, select it automatically
-        if len(meal_plans) == 1:
-            selected_plan = meal_plans[0]
-            st.info(f"Using meal plan: {selected_plan}")
-        else:
-            # Select meal plan
-            selected_plan = st.selectbox("Select meal plan", meal_plans)
+    # Check for current meal plan in session state
+    if st.session_state.current_meal_plan:
+        meal_plan = st.session_state.current_meal_plan
         
-        if selected_plan:
-            # Load the selected meal plan
-            meal_plan_path = os.path.join("meal_plans", selected_plan)
-            meal_plan = load_meal_plan(meal_plan_path)
-            
-            if not meal_plan:
-                st.error("Error loading meal plan")
-            else:
+        # Display meal plan details
+        st.subheader("Meal Plan Details")
+        
+        for date, meals in meal_plan.items():
+            with st.expander(f"Date: {date}"):
+                for meal in meals:
+                    st.write(meal)
+        
+        # Generate calendar invites
+        if st.button("Generate Calendar Invites"):
+            with st.spinner("Creating calendar events..."):
+                # Create a temporary filename for the calendar
+                filename = f"meal_plan_{datetime.now().strftime('%Y%m%d')}"
+                
+                # Generate calendar
+                cal = create_calendar(meal_plan)
+                ics_file = save_calendar(cal, filename)
+                
+                # Provide download link
+                with open(ics_file, "rb") as file:
+                    btn = st.download_button(
+                        label="Download Calendar File (.ics)",
+                        data=file,
+                        file_name=os.path.basename(ics_file),
+                        mime="text/calendar"
+                    )
+                
+                st.success("Calendar file created successfully!")
+                
+                # Add import instructions
+                with st.expander("How to import this calendar file"):
+                    st.markdown("""
+                    ### Importing your calendar file:
+                    
+                    #### Google Calendar:
+                    1. Go to [Google Calendar](https://calendar.google.com/)
+                    2. Click the "+" next to "Other calendars"
+                    3. Select "Import"
+                    4. Upload the .ics file you downloaded
+                    5. Choose the calendar to add the events to
+                    6. Click "Import"
+                    
+                    #### Apple Calendar:
+                    1. Open the Calendar app
+                    2. Go to File > Import
+                    3. Select the .ics file you downloaded
+                    4. Click "Import"
+                    
+                    #### Outlook:
+                    1. Open Outlook
+                    2. Go to File > Open & Export > Import/Export
+                    3. Select "Import an iCalendar (.ics) or vCalendar file"
+                    4. Browse to the .ics file you downloaded
+                    5. Click "Open"
+                    """)
+    else:
+        # List available meal plans - as a fallback
+        meal_plans = list_available_meal_plans()
+        
+        if not meal_plans:
+            st.warning("No meal plan found. Please upload an HTML file and create a meal plan in Step 1.")
+        else:
+            # If only one meal plan exists, select it automatically
+            if len(meal_plans) == 1:
+                selected_plan = meal_plans[0]
+                st.info(f"Using meal plan: {selected_plan}")
+                
+                # Load the selected meal plan
+                meal_plan_path = os.path.join("meal_plans", selected_plan)
+                meal_plan = load_meal_plan(meal_plan_path)
+                
+                # Store in session state
+                st.session_state.current_meal_plan = meal_plan
+                
                 # Display meal plan details
-                st.subheader("Meal Plan Details")
-                
-                for date, meals in meal_plan.items():
-                    with st.expander(f"Date: {date}"):
-                        for meal in meals:
-                            st.write(meal)
-                
-                # Generate calendar invites
-                if st.button("Generate Calendar Invites"):
-                    with st.spinner("Creating calendar events..."):
-                        cal = create_calendar(meal_plan)
-                        ics_file = save_calendar(cal, selected_plan)
-                        
-                        # Provide download link
-                        with open(ics_file, "rb") as file:
-                            btn = st.download_button(
-                                label="Download Calendar File (.ics)",
-                                data=file,
-                                file_name=os.path.basename(ics_file),
-                                mime="text/calendar"
-                            )
-                        
-                        st.success("Calendar file created successfully!")
-                        
-                        # Add import instructions
-                        with st.expander("How to import this calendar file"):
-                            st.markdown("""
-                            ### Importing your calendar file:
+                if meal_plan:
+                    st.subheader("Meal Plan Details")
+                    
+                    for date, meals in meal_plan.items():
+                        with st.expander(f"Date: {date}"):
+                            for meal in meals:
+                                st.write(meal)
+                    
+                    # Generate calendar invites
+                    if st.button("Generate Calendar Invites"):
+                        with st.spinner("Creating calendar events..."):
+                            cal = create_calendar(meal_plan)
+                            ics_file = save_calendar(cal, selected_plan)
                             
-                            #### Google Calendar:
-                            1. Go to [Google Calendar](https://calendar.google.com/)
-                            2. Click the "+" next to "Other calendars"
-                            3. Select "Import"
-                            4. Upload the .ics file you downloaded
-                            5. Choose the calendar to add the events to
-                            6. Click "Import"
+                            # Provide download link
+                            with open(ics_file, "rb") as file:
+                                btn = st.download_button(
+                                    label="Download Calendar File (.ics)",
+                                    data=file,
+                                    file_name=os.path.basename(ics_file),
+                                    mime="text/calendar"
+                                )
                             
-                            #### Apple Calendar:
-                            1. Open the Calendar app
-                            2. Go to File > Import
-                            3. Select the .ics file you downloaded
-                            4. Click "Import"
+                            st.success("Calendar file created successfully!")
                             
-                            #### Outlook:
-                            1. Open Outlook
-                            2. Go to File > Open & Export > Import/Export
-                            3. Select "Import an iCalendar (.ics) or vCalendar file"
-                            4. Browse to the .ics file you downloaded
-                            5. Click "Open"
-                            """)
+                            # Add import instructions
+                            with st.expander("How to import this calendar file"):
+                                st.markdown("""
+                                ### Importing your calendar file:
+                                
+                                #### Google Calendar:
+                                1. Go to [Google Calendar](https://calendar.google.com/)
+                                2. Click the "+" next to "Other calendars"
+                                3. Select "Import"
+                                4. Upload the .ics file you downloaded
+                                5. Choose the calendar to add the events to
+                                6. Click "Import"
+                                
+                                #### Apple Calendar:
+                                1. Open the Calendar app
+                                2. Go to File > Import
+                                3. Select the .ics file you downloaded
+                                4. Click "Import"
+                                
+                                #### Outlook:
+                                1. Open Outlook
+                                2. Go to File > Open & Export > Import/Export
+                                3. Select "Import an iCalendar (.ics) or vCalendar file"
+                                4. Browse to the .ics file you downloaded
+                                5. Click "Open"
+                                """)
+                else:
+                    st.error("Error loading meal plan")

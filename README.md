@@ -1,5 +1,7 @@
 # SenPro Meal Planner Scraper
 
+**Web App Available Here: https://senproscraper.streamlit.app/**
+
 A tool to scrape meal plans from HTML files and organize them into a structured JSON format. Optionally creates calendar invites for meal planning.
 
 ## Features
@@ -8,6 +10,7 @@ A tool to scrape meal plans from HTML files and organize them into a structured 
 - Organizes meal information by date and time
 - Saves data in a structured JSON format using the date as filename
 - Creates calendar invites (.ics files) from the meal plan data
+- Web interface for easy use without command line knowledge
 
 ## Installation (For Beginners)
 
@@ -80,16 +83,29 @@ Miniforge is a minimal installer for Conda, which is a package manager that will
    - Windows: `conda activate senpro_scrape`
    - macOS: `conda activate senpro_scrape`
 
-## Usage (For Beginners)
+## Usage
 
-### How to Save an HTML File from a Website
+### Web App (Recommended)
+
+The easiest way to use this tool is through the web app:
+
+1. Visit **https://senproscraper.streamlit.app/**
+2. Upload your HTML file in the "Create Meal Plan" tab
+3. View and save the extracted meal plan
+4. Switch to the "Generate Calendar Invites" tab to create and download calendar invites
+
+### Command Line Usage
+
+If you prefer using the command line or need more control:
+
+#### How to Save an HTML File from a Website
 
 1. Visit your meal planning website in your web browser
 2. Right-click on the page and select "Save As..." or "Save Page As..."
 3. Choose where to save the HTML file (remember this location)
 4. Save the file with a .html extension (e.g., `meal_plan.html`)
 
-### Scrape Meal Plans
+#### Scrape Meal Plans
 
 1. Make sure your conda environment is activated:
    ```
@@ -118,7 +134,7 @@ This will:
 2. Extract meal planning information
 3. Save it to a JSON file in the `meal_plans` folder
 
-### Create Calendar Invites
+#### Create Calendar Invites
 
 1. Make sure your conda environment is activated:
    ```
@@ -134,16 +150,33 @@ This will:
 
 4. The script will create a calendar file (.ics) in the `cal_invites` directory.
 
-### How to Use the Calendar File
+#### How to Use the Calendar File
 
 1. Locate the .ics file in the `cal_invites` directory
 2. Double-click the file to open it with your default calendar application (e.g., Outlook, Google Calendar, Apple Calendar)
 3. Your calendar application will prompt you to add these events to your calendar
 
+### Running the Web App Locally
+
+If you want to run the web app on your local machine:
+
+1. Make sure your conda environment is activated:
+   ```
+   conda activate senpro_scrape
+   ```
+
+2. Run the Streamlit app:
+   ```
+   streamlit run app.py
+   ```
+
+3. Your browser will open with the local version of the web app
+
 ## Directory Structure
 
 - `html_scrape.py`: Script to extract meal plan data from HTML files
 - `calendar_invite.py`: Script to generate calendar invites from meal plans
+- `app.py`: Streamlit web application
 - `meal_plans/`: Directory where extracted meal plans are stored
 - `cal_invites/`: Directory where calendar invites are stored
 

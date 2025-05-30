@@ -96,8 +96,20 @@ with tab1:
             with col2:
                 if st.button("Save Meal Plan"):
                     if filename:
+                        # Clean up existing meal plans
+                        plans_dir = "meal_plans"
+                        if os.path.exists(plans_dir):
+                            for file in os.listdir(plans_dir):
+                                if file.endswith('.json'):
+                                    os.remove(os.path.join(plans_dir, file))
+                        
                         saved_file = save_to_json(meal_plan, f"{filename}.json")
                         st.success(f"Meal plan saved to {saved_file}")
+                        
+                        # Update session state to indicate we have a new meal plan
+                        if 'new_meal_plan' not in st.session_state:
+                            st.session_state.new_meal_plan = True
+                        st.session_state.new_meal_plan = True
                     else:
                         st.error("Please provide a filename")
 
@@ -105,18 +117,23 @@ with tab1:
 with tab2:
     st.header("Step 2: Generate iCalendar File")
     st.write("""
-    Select your saved meal plan and generate an iCalendar (.ics) file that you can import into 
+    Generate an iCalendar (.ics) file from your meal plan that you can import into 
     Google Calendar, Apple Calendar, Outlook, or any other calendar application.
     """)
     
-    # List available meal plans
+    # List available meal plans - refresh on each run
     meal_plans = list_available_meal_plans()
     
     if not meal_plans:
-        st.warning("No meal plans found. Please create a meal plan first.")
+        st.warning("No meal plans found. Please create a meal plan first in Step 1.")
     else:
-        # Select meal plan
-        selected_plan = st.selectbox("Select meal plan", meal_plans)
+        # If only one meal plan exists, select it automatically
+        if len(meal_plans) == 1:
+            selected_plan = meal_plans[0]
+            st.info(f"Using meal plan: {selected_plan}")
+        else:
+            # Select meal plan
+            selected_plan = st.selectbox("Select meal plan", meal_plans)
         
         if selected_plan:
             # Load the selected meal plan

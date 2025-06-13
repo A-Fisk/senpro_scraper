@@ -78,9 +78,25 @@ def select_meals(soup, curr_date):
         # Get meal details
         meal_details = [x.text.strip() for x in curr_meal.find_all('a', class_='mealplan')]
         
+        # Extract recipe URLs
+        recipe_links = {}
+        for link in curr_meal.find_all('a', class_='mealplan'):
+            if 'href' in link.attrs and '/recipes/' in link['href']:
+                recipe_url = f"https://app.senprofessional.com{link['href']}"
+                recipe_name = link.text.strip()
+                recipe_links[recipe_name] = recipe_url
+        
         # Combine into a single string with time, title, and details
         result = " ".join([curr_time, meal_title] + meal_details)
         
+        # Add recipe links to the meal data
+        if recipe_links:
+            # Store meal result and recipe links together
+            result = {"text": result, "recipe_links": recipe_links}
+        else:
+            # If no recipe links, just store the text
+            result = {"text": result}
+            
         # Extract time for sorting
         time_str = curr_time.strip()
         # Store the meal and its time for sorting
@@ -101,7 +117,7 @@ def select_meals(soup, curr_date):
     # Sort by the time component
     meal_time_pairs.sort(key=lambda x: time_to_minutes(x[0]))
     
-    # Extract just the meal strings in the sorted order
+    # Extract just the meal data in the sorted order
     meal_total = [meal for _, meal in meal_time_pairs]
     
     return meal_total

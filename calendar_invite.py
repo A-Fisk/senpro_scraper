@@ -114,18 +114,26 @@ def parse_time_from_meal(meal_text):
     else:
         return None
 
-def create_calendar_event(date, meal_text):
+def create_calendar_event(date, meal_data):
     """
     Create a calendar event for a meal.
     
     Args:
         date: datetime object for the date of the meal
-        meal_text: Text describing the meal
+        meal_data: Dictionary containing meal text and recipe links
         
     Returns:
         icalendar.Event object
     """
     event = Event()
+    
+    # Handle both formats (string or dict) for backward compatibility
+    if isinstance(meal_data, str):
+        meal_text = meal_data
+        recipe_links = {}
+    else:
+        meal_text = meal_data.get("text", "")
+        recipe_links = meal_data.get("recipe_links", {})
     
     # Extract time from meal text
     time_str = parse_time_from_meal(meal_text)
@@ -137,13 +145,20 @@ def create_calendar_event(date, meal_text):
         # Default to noon if no time is found
         event_time = date.replace(hour=12, minute=0)
     
+    # Create description with recipe links
+    description = meal_text
+    if recipe_links:
+        description += "\n\nRecipes:"
+        for recipe_name, recipe_url in recipe_links.items():
+            description += f"\n{recipe_name}: {recipe_url}"
+    
     # Set event properties
     event.add('summary', meal_text)
     event.add('dtstart', event_time)
     event.add('dtend', event_time + timedelta(minutes=30))  # Default 30-minute duration
     event.add('dtstamp', datetime.now())
     event['uid'] = f"{event_time.strftime('%Y%m%dT%H%M%S')}@senproscrape.meal"
-    event.add('description', meal_text)
+    event.add('description', description)
     
     return event
 

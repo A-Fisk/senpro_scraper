@@ -9,6 +9,7 @@ A tool to scrape meal plans from HTML files and organize them into a structured 
 - Extracts meal planning data from saved HTML files
 - Organizes meal information by date and time
 - Saves data in a structured JSON format using the date as filename
+- Extracts recipe URLs and adds them to calendar event descriptions
 - Creates calendar invites (.ics files) from the meal plan data
 - Web interface for easy use without command line knowledge
 
@@ -109,7 +110,7 @@ If you prefer using the command line or need more control:
 
 This will:
 1. Read the HTML file
-2. Extract meal planning information
+2. Extract meal planning information and recipe URLs
 3. Save it to a JSON file in the `meal_plans` folder
 
 #### Create Calendar Invites
@@ -128,6 +129,7 @@ This will:
 1. Locate the .ics file in the `cal_invites` directory
 2. Double-click the file to open it with your default calendar application (e.g., Outlook, Google Calendar, Apple Calendar)
 3. Your calendar application will prompt you to add these events to your calendar
+4. Recipe links will be included in the notes/description field of each calendar event
 
 ### Running the Web App Locally
 

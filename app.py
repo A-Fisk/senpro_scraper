@@ -253,15 +253,15 @@ with tab2:
                         with st.expander(f"Date: {date}"):
                             for meal in meals:
                                 if isinstance(meal, dict):
-                            meal_text = meal.get("text", "")
-                            recipe_links = meal.get("recipe_links", {})
-                            
-                            st.write(meal_text)
-                            
-                            if recipe_links:
-                                st.markdown("**Recipes:**")
-                                for recipe_name, recipe_url in recipe_links.items():
-                                    st.markdown(f"- [{recipe_name}]({recipe_url})")
+                                    meal_text = meal.get("text", "")
+                                    recipe_links = meal.get("recipe_links", {})
+                                    
+                                    st.write(meal_text)
+                                    
+                                    if recipe_links:
+                                        st.markdown("**Recipes:**")
+                                        for recipe_name, recipe_url in recipe_links.items():
+                                            st.markdown(f"- [{recipe_name}]({recipe_url})")
                     
                     # Generate calendar invites
                     if st.button("Generate Calendar Invites"):

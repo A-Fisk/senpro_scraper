@@ -82,7 +82,10 @@ def select_meals(soup, curr_date):
         recipe_links = {}
         for link in curr_meal.find_all('a', class_='mealplan'):
             if 'href' in link.attrs and '/recipes/' in link['href']:
-                recipe_url = f"{link['href']}"
+                recipe_url = link['href']
+                # Add prefix if it doesn't already have it
+                if not recipe_url.startswith('app.senprofessional.com'):
+                    recipe_url = f"app.senprofessional.com{recipe_url}"
                 recipe_name = link.text.strip()
                 recipe_links[recipe_name] = recipe_url
         
